@@ -30,7 +30,7 @@ func main() {
 
 	defer config.DB.Close()
 
-	err = http.ListenAndServe("localhost:80", r)
+	err = http.ListenAndServe(":80", r)
 	if err != nil {
 		log.Fatal(err)
 	}
