@@ -93,7 +93,7 @@ func GetCDN(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	str := base64.StdEncoding.EncodeToString([]byte(url))
 	fmt.Println(str)
 
-	data.Url = "http://localhost/video?v=" + str + "&t=123sdqqwe"
+	data.Url = "/video?v=" + str + "&t=123sdqqwe"
 
 	path := filepath.Join("public", "html", "main", "video.html")
 
