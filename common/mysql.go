@@ -1,6 +1,7 @@
 package common
 
 import (
+	"awesomeProject/repo"
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -9,13 +10,13 @@ import (
 )
 
 type video struct {
-	vkId string
+	id   string `field:"id"`
+	vkId string `field:"vkId"`
+	url  string `field:"url"`
 }
 
-var Repo map[int]struct{}
-
 func GetMysql() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/site")
+	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/parser")
 
 	if err != nil {
 		return nil, err
@@ -24,12 +25,8 @@ func GetMysql() (*sql.DB, error) {
 	return db, nil
 }
 
-func InitRepo() {
-	Repo = make(map[int]struct{})
-}
-
 func UpdateRepo(db *sql.DB) {
-	rows, err := db.Query("SELECT vkId FROM video_contents")
+	rows, err := db.Query("SELECT id, vkId, url FROM video_contents")
 
 	if err != nil {
 		log.Fatal("can't select mysql: ", err)
@@ -40,7 +37,7 @@ func UpdateRepo(db *sql.DB) {
 	for rows.Next() {
 		v := video{}
 
-		err := rows.Scan(&v.vkId)
+		err := rows.Scan(&v.id, &v.vkId, &v.url)
 
 		if err != nil {
 			fmt.Println("Err scan: ", err)
@@ -55,6 +52,14 @@ func UpdateRepo(db *sql.DB) {
 			continue
 		}
 
-		Repo[vkId] = struct{}{}
+		id, err := strconv.Atoi(v.id)
+		if err != nil {
+			fmt.Println("err strconv: ", err)
+
+			continue
+		}
+
+		repo.RepoVkId[vkId] = struct{}{}
+		repo.RepoUrl[id] = v.url
 	}
 }

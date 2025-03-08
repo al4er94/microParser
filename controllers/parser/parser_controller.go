@@ -3,6 +3,7 @@ package parser
 import (
 	"awesomeProject/common"
 	"awesomeProject/config"
+	"awesomeProject/repo"
 	"encoding/base64"
 	"fmt"
 	"github.com/SevereCloud/vksdk/v2/api"
@@ -53,13 +54,37 @@ func Parser(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	fmt.Fprint(rw, "save files..")
 }
 
-func GetCDN(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+func GetVideo(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	link := r.FormValue("v")
+
+	dataCode, err := base64.StdEncoding.DecodeString(link)
+	if err != nil {
+		log.Fatal("error:", err)
+	}
+	url := string(dataCode)
+
+	http.Redirect(rw, r, url, http.StatusFound)
+}
+
+func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	videoId := r.FormValue("id")
+
+	id, err := strconv.Atoi(videoId)
+	if err != nil {
+		fmt.Println("err strconv: ", err)
+
+		return
+	}
+
+	url, ok := repo.RepoUrl[id]
+
+	if !ok {
+		log.Println("err video id: ", id)
+	}
+
 	client := &fasthttp.Client{}
-
-	link := r.FormValue("getLink")
-
 	req := fasthttp.AcquireRequest()
-	req.SetRequestURI(link)
+	req.SetRequestURI(url)
 	req.Header.SetUserAgent(r.UserAgent())
 	//req.Header.Set("Accept-Language", "ru-RU")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
@@ -68,7 +93,7 @@ func GetCDN(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	resp := fasthttp.AcquireResponse()
 
-	err := client.Do(req, resp)
+	err = client.Do(req, resp)
 
 	if err != nil {
 		log.Println("err file: ", err)
@@ -82,16 +107,15 @@ func GetCDN(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	var data VideoData
 
-	url := ""
+	urlCode := ""
 
 	for extention, urlVal := range urlsMap {
 		if extention == common.Extention360 {
-			url = urlVal
+			urlCode = urlVal
 		}
 	}
 
-	str := base64.StdEncoding.EncodeToString([]byte(url))
-	fmt.Println(str)
+	str := base64.StdEncoding.EncodeToString([]byte(urlCode))
 
 	data.Url = "/video?v=" + str + "&t=123sdqqwe"
 
@@ -111,16 +135,4 @@ func GetCDN(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		return
 	}
-}
-
-func GetVideo(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	link := r.FormValue("v")
-
-	dataCode, err := base64.StdEncoding.DecodeString(link)
-	if err != nil {
-		log.Fatal("error:", err)
-	}
-	url := string(dataCode)
-
-	http.Redirect(rw, r, url, http.StatusFound)
 }
