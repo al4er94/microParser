@@ -10,6 +10,8 @@ import (
 )
 
 func main() {
+	log.Println("START SERV: ")
+
 	r := httprouter.New()
 	routes(r)
 
@@ -32,6 +34,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	log.Println("LISTEN AND SERV")
 }
 
 func routes(r *httprouter.Router) {
