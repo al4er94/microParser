@@ -1,0 +1,8 @@
+<script type="module">
+    let url = window.location.href
+    if (url.includes("#") === true) {
+        let replaceUrl = url.replace("#", "?")
+        console.log(replaceUrl)
+        window.location.replace(replaceUrl)
+    }
+</script>

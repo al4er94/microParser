@@ -1,0 +1,32 @@
+{{define "index"}}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>VK parser</h1>
+<p>
+    token: {{.Token}}
+    {{if gt .ShowLink 0 }}
+        <a href="{{.AuthLink}}"> get token</a>
+    {{end}}
+</p>
+{{if eq .ShowLink 0 }}
+<p>
+    <form method="post" action="/parser" name="linkGroupForm">
+        <label for="linkGroup">linkGroup: </label><input type="text" id="linkGroup" name="linkGroup">
+        <input type="submit">
+    </form>
+</p>
+{{end}}
+<p>
+<form method="post" action="/getLink" name="linkGroupForm">
+    <label for="getLink">get CDN: </label><input type="text" id="getLink" name="getLink">
+    <input type="submit">
+</form>
+</p>
+</body>
+</html>
+{{end}}
