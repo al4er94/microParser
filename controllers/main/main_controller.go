@@ -18,7 +18,7 @@ func StartPage(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	var data IndexData
 	data.Token = config.Token
 	data.ShowLink = 0
-	data.AuthLink = "https://oauth.vk.com/authorize?client_id=51908038&display=page&redirect_uri=http://localhost:81/auth&scope=video,groups&response_type=token&v=5.131&state=123456"
+	data.AuthLink = "https://oauth.vk.com/authorize?client_id=51908038&display=page&redirect_uri=http://localhost/auth&scope=video,groups&response_type=token&v=5.131&state=123456"
 
 	if len(data.Token) == 0 {
 		data.Token = "empty token"

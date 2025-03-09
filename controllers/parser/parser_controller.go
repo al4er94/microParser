@@ -20,8 +20,13 @@ import (
 
 const ttlLink = 60
 
+const host = "http://site/"
+
 type VideoData struct {
-	Url string
+	Url    string
+	ImgUrl string
+	Width  string
+	Height string
 }
 
 type token struct {
@@ -41,22 +46,29 @@ func Parser(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	}
 
 	log.Println(group[0].ID)
-
-	vidParams := api.Params{}
-	vidParams["owner_id"] = "-" + strconv.Itoa(group[0].ID)
-	vidParams["offset"] = 200
-	// get information about the group
-	videos, err := vk.VideoGet(vidParams)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	count := 40
+	offset := 0
 	go func() {
-		c := 0
-		for _, video := range videos.Items {
-			common.ParseVideo(video)
-			c++
+		for i := 0; i <= 10; i++ {
+			time.Sleep(2 * time.Second)
+
+			vidParams := api.Params{}
+			vidParams["owner_id"] = "-" + strconv.Itoa(group[0].ID)
+			vidParams["offset"] = offset
+			vidParams["count"] = count
+			// get information about the group
+			videos, err := vk.VideoGet(vidParams)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			for _, video := range videos.Items {
+				time.Sleep(1 * time.Second)
+				common.ParseVideo(video)
+			}
+
+			offset += count
 		}
 	}()
 
@@ -113,7 +125,7 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		return
 	}
 
-	url, ok := repo.RepoUrl[id]
+	entity, ok := repo.RepoUrl[id]
 
 	if !ok {
 		log.Println("err video id: ", id)
@@ -121,7 +133,7 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	client := &fasthttp.Client{}
 	req := fasthttp.AcquireRequest()
-	req.SetRequestURI(url)
+	req.SetRequestURI(entity.Url)
 	req.Header.SetUserAgent(r.UserAgent())
 	//req.Header.Set("Accept-Language", "ru-RU")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
@@ -155,6 +167,9 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	str := base64.StdEncoding.EncodeToString([]byte(urlCode))
 
 	data.Url = "/video?v=" + str + "&t=123sdqqwe"
+	data.ImgUrl = host + entity.ImgUrl
+	data.Width = r.FormValue("width")
+	data.Height = r.FormValue("height")
 
 	path := filepath.Join("public", "html", "main", "video.html")
 

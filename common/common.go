@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -29,7 +30,6 @@ const folderName = "videos"
 
 var extentions = []string{
 	Extention360,
-	//extention720,
 }
 
 func ParseVideo(video object.VideoVideo) {
@@ -63,7 +63,7 @@ func ParseVideo(video object.VideoVideo) {
 	finishUrl := player.Scheme + "://" + player.Host + "/video" + params.Get("oid") + "_" + params.Get("id")
 
 	imgPath := ""
-
+	saveVid := false
 	for _, videoIm := range video.Image {
 		if videoIm.Width == 720 {
 			log.Println("Width: ", videoIm.Width, " IM ", videoIm.BaseImage.Width, " id: ", videoId)
@@ -71,6 +71,32 @@ func ParseVideo(video object.VideoVideo) {
 
 			if err != nil {
 				log.Fatal("err save file photo: ", err)
+			}
+
+			saveVid = true
+		}
+	}
+
+	if !saveVid {
+		extArr := []float64{}
+		for _, videoIm := range video.Image {
+			extArr = append(extArr, videoIm.Width)
+		}
+
+		sort.Float64s(extArr)
+
+		ext := extArr[len(extArr)-1]
+
+		for _, videoIm := range video.Image {
+			if videoIm.Width == ext {
+				strExt := strconv.FormatFloat(ext, 'g', 1, 64)
+
+				log.Println("Width: ", videoIm.Width, " IM ", videoIm.BaseImage.Width, " id: ", videoId)
+				imgPath, err = DownloadPhoto(folderName, videoId, strExt, videoIm.BaseImage.URL)
+
+				if err != nil {
+					log.Fatal("err save file photo: ", err)
+				}
 			}
 		}
 	}
@@ -120,14 +146,6 @@ func GetUrls(code string) map[string]string {
 }
 
 func DownloadPhoto(filepath, videoId, extension, url string) (string, error) {
-
-	filepath = filepath + pathDelimetr + videoId
-
-	ex, err := exists(filepath)
-
-	if err != nil || !ex {
-		log.Fatal("err check file path: ", err)
-	}
 
 	filepath = filepath + pathDelimetr + videoId + "_" + extension + ".jpg"
 

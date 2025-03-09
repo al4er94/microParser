@@ -10,9 +10,10 @@ import (
 )
 
 type video struct {
-	id   string `field:"id"`
-	vkId string `field:"vkId"`
-	url  string `field:"url"`
+	id         string `field:"id"`
+	vkId       string `field:"vkId"`
+	url        string `field:"url"`
+	previewUrl string `field:"previewUrl"`
 }
 
 func GetMysql() (*sql.DB, error) {
@@ -26,7 +27,7 @@ func GetMysql() (*sql.DB, error) {
 }
 
 func UpdateRepo(db *sql.DB) {
-	rows, err := db.Query("SELECT id, vkId, url FROM video_contents")
+	rows, err := db.Query("SELECT id, vkId, url, previewUrl FROM video_contents")
 
 	if err != nil {
 		log.Fatal("can't select mysql: ", err)
@@ -37,7 +38,7 @@ func UpdateRepo(db *sql.DB) {
 	for rows.Next() {
 		v := video{}
 
-		err := rows.Scan(&v.id, &v.vkId, &v.url)
+		err := rows.Scan(&v.id, &v.vkId, &v.url, &v.previewUrl)
 
 		if err != nil {
 			fmt.Println("Err scan: ", err)
@@ -59,7 +60,12 @@ func UpdateRepo(db *sql.DB) {
 			continue
 		}
 
+		var entity repo.VideoEntity
+
+		entity.Url = v.url
+		entity.ImgUrl = v.previewUrl
+
 		repo.RepoVkId[vkId] = struct{}{}
-		repo.RepoUrl[id] = v.url
+		repo.RepoUrl[id] = entity
 	}
 }
