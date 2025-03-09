@@ -5,6 +5,7 @@ import (
 	"awesomeProject/config"
 	"awesomeProject/repo"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 	"github.com/SevereCloud/vksdk/v2/api"
 	"github.com/julienschmidt/httprouter"
@@ -14,10 +15,18 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"time"
 )
+
+const ttlLink = 60
 
 type VideoData struct {
 	Url string
+}
+
+type token struct {
+	Time int64  `json:"time"`
+	Ua   string `json:"ua"`
 }
 
 func Parser(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
@@ -67,11 +76,39 @@ func GetVideo(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 }
 
 func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	tkn := r.FormValue("tkn")
+
+	var tknStruct token
+
+	jsonTkn, err := base64.StdEncoding.DecodeString(tkn)
+
+	if err != nil {
+		log.Println("error base64 decode:", err)
+
+		return
+	}
+
+	log.Println(string(jsonTkn))
+
+	err = json.Unmarshal(jsonTkn, &tknStruct)
+
+	if err != nil {
+		log.Println("error json decode:", err)
+
+		return
+	}
+
 	videoId := r.FormValue("id")
 
 	id, err := strconv.Atoi(videoId)
 	if err != nil {
 		fmt.Println("err strconv: ", err)
+
+		return
+	}
+
+	if !validateToken(r, tknStruct) {
+		fmt.Println("err validate token: ", err)
 
 		return
 	}
@@ -135,4 +172,22 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 		return
 	}
+}
+
+func validateToken(r *http.Request, tkn token) bool {
+	if r.UserAgent() != tkn.Ua {
+		log.Println("diff UA")
+
+		return false
+	}
+
+	now := time.Now().Unix()
+
+	if now-tkn.Time > ttlLink {
+		log.Println("ttl exp")
+
+		return false
+	}
+
+	return true
 }
