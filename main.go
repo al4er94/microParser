@@ -39,7 +39,6 @@ func main() {
 	log.Println("LISTEN START ")
 
 	go func() {
-
 		err = http.ListenAndServe(":81", r)
 		if err != nil {
 			log.Fatal(err)
@@ -61,6 +60,8 @@ func routes(r *httprouter.Router) {
 	r.GET("/video", parsercontroller.GetVideo)
 	r.GET("/content", parsercontroller.GetContent)
 	r.POST("/parser", parsercontroller.Parser)
+
+	r.ServeFiles("/static/*filepath", http.Dir("./public/node_modules"))
 }
 
 func initTask(t ...task.Task) {

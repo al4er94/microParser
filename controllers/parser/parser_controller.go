@@ -18,7 +18,7 @@ import (
 	"time"
 )
 
-const ttlLink = 60
+const ttlLink = 600
 
 const host = "http://site/"
 
