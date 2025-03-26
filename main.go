@@ -47,8 +47,6 @@ func main() {
 		}
 	}()
 
-	log.Println("LISTEN AND SERV")
-
 	<-stopChan
 	finalize()
 	os.Exit(0)
@@ -59,6 +57,7 @@ func routes(r *httprouter.Router) {
 	r.GET("/auth", maincontroller.GetToken)
 	r.GET("/video", parsercontroller.GetVideo)
 	r.GET("/content", parsercontroller.GetContent)
+	r.GET("/test", parsercontroller.GetTestContent)
 	r.POST("/parser", parsercontroller.Parser)
 
 	r.ServeFiles("/static/*filepath", http.Dir("./public/node_modules"))

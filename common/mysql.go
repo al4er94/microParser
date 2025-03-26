@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
-	"log"
 	"strconv"
 )
 
@@ -30,7 +29,7 @@ func UpdateRepo(db *sql.DB) {
 	rows, err := db.Query("SELECT id, vkId, url, previewUrl FROM video_contents")
 
 	if err != nil {
-		log.Fatal("can't select mysql: ", err)
+		fmt.Println("can't select mysql: ", err)
 
 		return
 	}
