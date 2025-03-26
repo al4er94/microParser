@@ -223,8 +223,6 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 
 	code := string(resp.Body())
 
-	fmt.Println(code)
-
 	urlsMap := common.GetUrls(code)
 
 	var data VideoData
