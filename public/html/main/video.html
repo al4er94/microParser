@@ -10,6 +10,10 @@
           width: 100% !important;
           aspect-ratio: 2 / 1 !important;
         }
+
+        .vjs-poster {
+            display: none;
+        }
     </style>   
 </head>
 <body>
@@ -21,12 +25,24 @@
             width="{{.Width}}"
             height="{{.Height}}"
             poster="{{.ImgUrl}}"
-            data-setup='{"controlBar": {"pictureInPictureToggle": false}}'
     >
-    <source src="{{.Url}}" type="video/mp4" label='480' res='480'/>
-    <source src="{{.Url}}" type="video/mp4" label='720' res='720'/>
+    <source src="{{.Url}}" type="video/mp4" label='480P' selected="true"/>
+    <source src="{{.Url}}" type="video/mp4" label='720P' />
 </video>
-<script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
-    <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/silvermine-videojs-quality-selector.min.js"></script>
+   <script src="https://vjs.zencdn.net/8.16.1/video.min.js"></script>
+   <script src="https://unpkg.com/@silvermine/videojs-quality-selector/dist/js/silvermine-videojs-quality-selector.min.js"></script>
+   <script>
+    videojs('my-video', {
+   controlBar: {
+        children: [
+            'playToggle',
+            'progressControl',
+            'volumePanel',
+            'qualitySelector',
+            'fullscreenToggle',
+        ],
+    },
+    });
+</script>
 </body>
 </html>
