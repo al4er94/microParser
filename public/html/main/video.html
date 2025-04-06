@@ -1,10 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="overflow: hidden;">
 <head>
     <meta charset="UTF-8">
     <title>Video</title>
     <link href="https://vjs.zencdn.net/8.16.1/video-js.css" rel="stylesheet" />
     <link href="https://unpkg.com/@silvermine/videojs-quality-selector/dist/css/quality-selector.css" rel="stylesheet">
+    <style>
+        .my-video-dimensions, .video-js {
+          width: 100% !important;
+          aspect-ratio: 2 / 1 !important;
+        }
+    </style>   
 </head>
 <body>
     <video
