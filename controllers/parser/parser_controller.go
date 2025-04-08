@@ -23,10 +23,12 @@ const ttlLink = 600
 const host = "http://site/"
 
 type VideoData struct {
-	Url    string
-	ImgUrl string
-	Width  string
-	Height string
+	Url360  string
+	Url720  string
+	Url1080 string
+	ImgUrl  string
+	Width   string
+	Height  string
 }
 
 type token struct {
@@ -47,7 +49,7 @@ func Parser(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	log.Println(group[0].ID)
 	count := 40
-	offset := 0
+	offset := 850
 	go func() {
 		for i := 0; i <= 10; i++ {
 			time.Sleep(2 * time.Second)
@@ -166,7 +168,7 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 
 	str := base64.StdEncoding.EncodeToString([]byte(urlCode))
 
-	data.Url = "/video?v=" + str + "&t=123sdqqwe"
+	data.Url360 = "/video?v=" + str + "&t=123sdqqwe"
 	data.ImgUrl = host + entity.ImgUrl
 	data.Width = r.FormValue("width")
 	data.Height = r.FormValue("height")
@@ -206,7 +208,6 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 	req := fasthttp.AcquireRequest()
 	req.SetRequestURI(string(urlVideo))
 	req.Header.SetUserAgent(r.UserAgent())
-	//req.Header.Set("Accept-Language", "ru-RU")
 	req.Header.Set("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
 	req.Header.Set("Cookie", "remixmdevice=2560/1440/2/!!-!!!!!!!!-/2560;")
 	req.Header.SetMethod(fasthttp.MethodGet)
@@ -227,19 +228,31 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 
 	var data VideoData
 
-	urlCode := ""
+	urlCode360 := ""
+	urlCode720 := ""
+	urlCode1080 := ""
+
+	log.Println(urlsMap)
 
 	for extention, urlVal := range urlsMap {
 		if extention == common.Extention360 {
-			urlCode = urlVal
+			urlCode360 = urlVal
+		}
+		if extention == common.Extention720 {
+			urlCode720 = urlVal
+		}
+		if extention == common.Extention1080 {
+			urlCode1080 = urlVal
 		}
 	}
 
-	str := base64.StdEncoding.EncodeToString([]byte(urlCode))
+	urlCode360 = base64.StdEncoding.EncodeToString([]byte(urlCode360))
+	urlCode720 = base64.StdEncoding.EncodeToString([]byte(urlCode720))
+	urlCode1080 = base64.StdEncoding.EncodeToString([]byte(urlCode1080))
 
-	fmt.Println(urlCode)
-
-	data.Url = "/video?v=" + str + "&t=123sdqqwe"
+	data.Url360 = "/video?v=" + urlCode360 + "&t=123sdqqwe"
+	data.Url720 = "/video?v=" + urlCode720 + "&t=123sdqqwe"
+	data.Url1080 = "/video?v=" + urlCode1080 + "&t=123sdqqwe"
 	data.ImgUrl = ""
 	data.Width = r.FormValue("width")
 	data.Height = r.FormValue("height")

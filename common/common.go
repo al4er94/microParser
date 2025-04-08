@@ -19,7 +19,8 @@ import (
 const pathDelimetr = "/"
 
 const Extention360 = "360"
-const extention720 = "720"
+const Extention720 = "720"
+const Extention1080 = "1080"
 
 const folderName = "videos"
 
@@ -30,6 +31,8 @@ const folderName = "videos"
 
 var extentions = []string{
 	Extention360,
+	Extention720,
+	Extention1080,
 }
 
 func ParseVideo(video object.VideoVideo) {
