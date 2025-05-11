@@ -3,9 +3,9 @@ package videos
 import (
 	"awesomeProject/common"
 	"awesomeProject/config"
+	"awesomeProject/logs"
 	"awesomeProject/repo"
 	"awesomeProject/task"
-	"log"
 	"time"
 )
 
@@ -26,7 +26,7 @@ func (t *videoTask) Run() {
 				return
 			case <-t.ticker.C:
 				if err := t.handler(); err != nil {
-					log.Println("Err task: ", err)
+					log.Info("Err task: ", err)
 				}
 			}
 		}
@@ -34,7 +34,7 @@ func (t *videoTask) Run() {
 }
 
 func (t *videoTask) handler() error {
-	log.Println(len(repo.RepoUrl))
+	log.Info(len(repo.RepoUrl))
 
 	common.UpdateRepo(config.DB)
 

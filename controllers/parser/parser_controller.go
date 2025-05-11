@@ -3,6 +3,7 @@ package parser
 import (
 	"awesomeProject/common"
 	"awesomeProject/config"
+	"awesomeProject/logs"
 	"awesomeProject/repo"
 	"encoding/base64"
 	"encoding/json"
@@ -11,7 +12,6 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"github.com/valyala/fasthttp"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -20,7 +20,7 @@ import (
 
 const ttlLink = 600
 
-const host = "http://site/"
+const host = "http://leaked-girls.com/"
 
 type VideoData struct {
 	Url360  string
@@ -47,7 +47,7 @@ func Parser(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		log.Fatal(err)
 	}
 
-	log.Println(group[0].ID)
+	log.Info(group[0].ID)
 	count := 40
 	offset := 850
 	go func() {
@@ -97,17 +97,17 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	jsonTkn, err := base64.StdEncoding.DecodeString(tkn)
 
 	if err != nil {
-		log.Println("error base64 decode:", err)
+		log.Info("error base64 decode:", err)
 
 		return
 	}
 
-	log.Println(string(jsonTkn))
+	log.Info(string(jsonTkn))
 
 	err = json.Unmarshal(jsonTkn, &tknStruct)
 
 	if err != nil {
-		log.Println("error json decode:", err)
+		log.Info("error json decode:", err)
 
 		return
 	}
@@ -130,7 +130,7 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	entity, ok := repo.RepoUrl[id]
 
 	if !ok {
-		log.Println("err video id: ", id)
+		log.Info("err video id: ", id)
 	}
 
 	client := &fasthttp.Client{}
@@ -147,7 +147,7 @@ func GetContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params) {
 	err = client.Do(req, resp)
 
 	if err != nil {
-		log.Println("err file: ", err)
+		log.Error("err file: ", err)
 
 		return
 	}
@@ -197,12 +197,13 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 	urlVideo, err := base64.StdEncoding.DecodeString(videoUrlEncode)
 
 	if err != nil {
-		log.Println("error base64 decode:", err)
+		log.Error("error base64 decode:", err)
 
 		return
 	}
 
 	fmt.Println("video: ", string(urlVideo))
+	log.Info("video: ", string(urlVideo))
 
 	client := &fasthttp.Client{}
 	req := fasthttp.AcquireRequest()
@@ -217,7 +218,7 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 	err = client.Do(req, resp)
 
 	if err != nil {
-		log.Println("err file: ", err)
+		log.Error("err file: ", err)
 
 		return
 	}
@@ -232,7 +233,7 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 	urlCode720 := ""
 	urlCode1080 := ""
 
-	log.Println(urlsMap)
+	log.Error(urlsMap)
 
 	for extention, urlVal := range urlsMap {
 		if extention == common.Extention360 {
@@ -277,7 +278,7 @@ func GetTestContent(rw http.ResponseWriter, r *http.Request, p httprouter.Params
 
 func validateToken(r *http.Request, tkn token) bool {
 	if r.UserAgent() != tkn.Ua {
-		log.Println("diff UA")
+		log.Error("diff UA")
 
 		return false
 	}
@@ -285,7 +286,7 @@ func validateToken(r *http.Request, tkn token) bool {
 	now := time.Now().Unix()
 
 	if now-tkn.Time > ttlLink {
-		log.Println("ttl exp")
+		log.Error("ttl exp")
 
 		return false
 	}

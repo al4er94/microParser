@@ -1,6 +1,7 @@
 package common
 
 import (
+	log "awesomeProject/logs"
 	"awesomeProject/repo"
 	"database/sql"
 	"fmt"
@@ -16,7 +17,7 @@ type video struct {
 }
 
 func GetMysql() (*sql.DB, error) {
-	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/parser")
+	db, err := sql.Open("mysql", "new_user:password@tcp(localhost:3306)/db") // test root:@tcp(localhost:3306)/parser
 
 	if err != nil {
 		return nil, err
@@ -29,7 +30,7 @@ func UpdateRepo(db *sql.DB) {
 	rows, err := db.Query("SELECT id, vkId, url, previewUrl FROM video_contents")
 
 	if err != nil {
-		fmt.Println("can't select mysql: ", err)
+		log.Error("can't select mysql: ", err)
 
 		return
 	}

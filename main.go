@@ -5,11 +5,11 @@ import (
 	"awesomeProject/config"
 	maincontroller "awesomeProject/controllers/main"
 	parsercontroller "awesomeProject/controllers/parser"
+	"awesomeProject/logs"
 	"awesomeProject/repo"
 	"awesomeProject/task"
 	"awesomeProject/task/videos"
 	"github.com/julienschmidt/httprouter"
-	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -24,7 +24,8 @@ var stopChan = make(chan struct{})
 var signalChan = make(chan os.Signal, 1)
 
 func main() {
-	log.Println("START SERV: ")
+	log.Setup("parser")
+	log.Info("START SERV: ")
 
 	r := httprouter.New()
 	routes(r)
@@ -36,10 +37,10 @@ func main() {
 	)
 
 	initialize()
-	log.Println("LISTEN START ")
+	log.Info("LISTEN START ")
 
 	go func() {
-		err = http.ListenAndServe(":80", r)
+		err = http.ListenAndServe(":81", r)
 		if err != nil {
 			log.Fatal(err)
 
@@ -113,7 +114,7 @@ func initialize() {
 }
 
 func finalize() {
-	log.Println("STOP")
+	log.Info("STOP")
 
 	for _, f := range finalizer {
 		f()
