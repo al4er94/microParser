@@ -40,7 +40,7 @@ func main() {
 	log.Info("LISTEN START ")
 
 	go func() {
-		err = http.ListenAndServe(":81", r)
+		err = http.ListenAndServeTLS(":81", "cert.pem", "privkey.pem", r)
 		if err != nil {
 			log.Fatal(err)
 
