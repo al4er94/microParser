@@ -54,12 +54,12 @@ func main() {
 }
 
 func routes(r *httprouter.Router) {
-	r.GET("/", maincontroller.StartPage)
+	//r.GET("/", maincontroller.StartPage)
 	r.GET("/auth", maincontroller.GetToken)
 	r.GET("/video", parsercontroller.GetVideo)
 	r.GET("/content", parsercontroller.GetContent)
 	r.GET("/test", parsercontroller.GetTestContent)
-	r.POST("/parser", parsercontroller.Parser)
+	//r.POST("/parser", parsercontroller.Parser)
 
 	r.ServeFiles("/static/*filepath", http.Dir("./public/node_modules"))
 }
